@@ -6,11 +6,12 @@ import logging
 
 from backend.database import get_db
 from backend.models import District, Village, HealthRecord, PredictivePattern
-from backend.dependencies import get_current_user
+from backend.dependencies import get_current_user, require_admin
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
+# Router requires authentication on all routes; individual write routes also require admin role.
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
@@ -87,7 +88,8 @@ class HealthRecordResponse(BaseModel):
 
 
 # District endpoints
-@router.post("/districts", response_model=DistrictResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/districts", response_model=DistrictResponse, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(require_admin)])
 async def create_district(district: DistrictCreate, db: Session = Depends(get_db)):
     """Create a new district"""
     try:
@@ -119,7 +121,8 @@ async def get_district(district_id: int, db: Session = Depends(get_db)):
     return district
 
 
-@router.put("/districts/{district_id}", response_model=DistrictResponse)
+@router.put("/districts/{district_id}", response_model=DistrictResponse,
+            dependencies=[Depends(require_admin)])
 async def update_district(district_id: int, district: DistrictCreate, db: Session = Depends(get_db)):
     """Update a district"""
     db_district = db.query(District).filter(District.id == district_id).first()
@@ -136,7 +139,8 @@ async def update_district(district_id: int, district: DistrictCreate, db: Sessio
     return db_district
 
 
-@router.delete("/districts/{district_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/districts/{district_id}", status_code=status.HTTP_204_NO_CONTENT,
+               dependencies=[Depends(require_admin)])
 async def delete_district(district_id: int, db: Session = Depends(get_db)):
     """Delete a district"""
     db_district = db.query(District).filter(District.id == district_id).first()
@@ -149,7 +153,8 @@ async def delete_district(district_id: int, db: Session = Depends(get_db)):
 
 
 # Village endpoints
-@router.post("/villages", response_model=VillageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/villages", response_model=VillageResponse, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(require_admin)])
 async def create_village(village: VillageCreate, db: Session = Depends(get_db)):
     """Create a new village"""
     try:
@@ -181,7 +186,8 @@ async def get_village(village_id: int, db: Session = Depends(get_db)):
     return village
 
 
-@router.put("/villages/{village_id}", response_model=VillageResponse)
+@router.put("/villages/{village_id}", response_model=VillageResponse,
+            dependencies=[Depends(require_admin)])
 async def update_village(village_id: int, village: VillageCreate, db: Session = Depends(get_db)):
     """Update a village"""
     db_village = db.query(Village).filter(Village.id == village_id).first()
@@ -198,7 +204,8 @@ async def update_village(village_id: int, village: VillageCreate, db: Session = 
     return db_village
 
 
-@router.delete("/villages/{village_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/villages/{village_id}", status_code=status.HTTP_204_NO_CONTENT,
+               dependencies=[Depends(require_admin)])
 async def delete_village(village_id: int, db: Session = Depends(get_db)):
     """Delete a village"""
     db_village = db.query(Village).filter(Village.id == village_id).first()
@@ -243,7 +250,8 @@ async def get_health_record(record_id: int, db: Session = Depends(get_db)):
     return record
 
 
-@router.put("/health-records/{record_id}", response_model=HealthRecordResponse)
+@router.put("/health-records/{record_id}", response_model=HealthRecordResponse,
+            dependencies=[Depends(require_admin)])
 async def update_health_record(record_id: int, record: HealthRecordCreate, db: Session = Depends(get_db)):
     """Update a health record"""
     db_record = db.query(HealthRecord).filter(HealthRecord.id == record_id).first()
@@ -260,7 +268,8 @@ async def update_health_record(record_id: int, record: HealthRecordCreate, db: S
     return db_record
 
 
-@router.delete("/health-records/{record_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/health-records/{record_id}", status_code=status.HTTP_204_NO_CONTENT,
+               dependencies=[Depends(require_admin)])
 async def delete_health_record(record_id: int, db: Session = Depends(get_db)):
     """Delete a health record"""
     db_record = db.query(HealthRecord).filter(HealthRecord.id == record_id).first()
@@ -310,7 +319,8 @@ async def get_pattern(pattern_id: int, db: Session = Depends(get_db)):
     return pattern
 
 
-@router.post("/patterns", response_model=PredictivePatternResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/patterns", response_model=PredictivePatternResponse, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(require_admin)])
 async def create_pattern(pattern: PredictivePatternCreate, db: Session = Depends(get_db)):
     """Create a new predictive pattern"""
     db_pattern = PredictivePattern(**pattern.model_dump())
@@ -320,7 +330,8 @@ async def create_pattern(pattern: PredictivePatternCreate, db: Session = Depends
     return db_pattern
 
 
-@router.put("/patterns/{pattern_id}", response_model=PredictivePatternResponse)
+@router.put("/patterns/{pattern_id}", response_model=PredictivePatternResponse,
+            dependencies=[Depends(require_admin)])
 async def update_pattern(pattern_id: int, pattern: PredictivePatternCreate, db: Session = Depends(get_db)):
     """Update a predictive pattern"""
     db_pattern = db.query(PredictivePattern).filter(PredictivePattern.id == pattern_id).first()
@@ -334,7 +345,8 @@ async def update_pattern(pattern_id: int, pattern: PredictivePatternCreate, db: 
     return db_pattern
 
 
-@router.delete("/patterns/{pattern_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/patterns/{pattern_id}", status_code=status.HTTP_204_NO_CONTENT,
+               dependencies=[Depends(require_admin)])
 async def delete_pattern(pattern_id: int, db: Session = Depends(get_db)):
     """Delete a predictive pattern"""
     db_pattern = db.query(PredictivePattern).filter(PredictivePattern.id == pattern_id).first()

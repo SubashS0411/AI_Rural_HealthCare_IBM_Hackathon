@@ -79,7 +79,7 @@ export default function VillageDetail({ village, districtId, onClose }: VillageD
         <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Village Details</div>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0.25rem 0' }}>{village.village_name}</h2>
         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
-          <span className="badge badge-default">Pop: {village.population.toLocaleString()}</span>
+          <span className="badge badge-default">Pop: {(village.population ?? 0).toLocaleString()}</span>
           <span className="badge badge-error">
             Score: {Math.round(village.composite_score)}
             <span style={{ fontSize: '0.65rem', marginLeft: '0.4rem', opacity: 0.8, textTransform: 'lowercase' }}>

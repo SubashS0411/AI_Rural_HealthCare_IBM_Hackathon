@@ -45,6 +45,16 @@ export default function RiskTable({ villages, selectedId, onSelect }: RiskTableP
               <tr 
                 key={v.village_id} 
                 onClick={() => onSelect(v.village_id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelect(v.village_id);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Select village ${v.village_name}, risk score ${v.composite_score}`}
+                aria-pressed={v.village_id === selectedId}
                 style={{ 
                   cursor: 'pointer',
                   background: v.village_id === selectedId ? 'rgba(13, 148, 136, 0.08)' : undefined,

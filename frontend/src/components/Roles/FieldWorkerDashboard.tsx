@@ -18,6 +18,10 @@ export default function FieldWorkerDashboard() {
   const [submitStatus, setSubmitStatus] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   
+  // Observation log state
+  const [observationText, setObservationText] = useState('');
+  const [observationSubmitting, setObservationSubmitting] = useState(false);
+  
   const [incidentForm, setIncidentForm] = useState({ type: 'disease_outbreak', severity: 'high', description: '' });
   const [medicineForm, setMedicineForm] = useState({ name: '', quantity: 10, urgency: 'high', notes: '' });
 
@@ -65,6 +69,26 @@ export default function FieldWorkerDashboard() {
       'Report infrastructure gaps',
       'Verify staffing schedules'
     ];
+  };
+
+  const submitObservation = async (villageId: number, e: React.FormEvent) => {
+    e.preventDefault();
+    if (!observationText.trim()) return;
+    setObservationSubmitting(true);
+    try {
+      // Post as a low-severity incident report to the field log endpoint
+      await api.post('/incident-reports', {
+        village_id: villageId,
+        incident_type: 'other',
+        severity: 'low',
+        description: `[Field Observation] ${observationText.trim()}`,
+      });
+      setObservationText('');
+    } catch (err) {
+      console.error('Observation log error', err);
+    } finally {
+      setObservationSubmitting(false);
+    }
   };
 
   const submitIncident = async (e: React.FormEvent) => {
@@ -275,42 +299,70 @@ export default function FieldWorkerDashboard() {
                             <div style={{ marginBottom: '1.5rem', background: 'var(--bg-primary)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                                 <Activity size={18} color="var(--indigo)" />
-                                <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 600 }}>Log Field Observation</h4>
+                                <label htmlFor={`obs-${task.village_id}`} style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer' }}>Log Field Observation</label>
                               </div>
-                              <p style={{ margin: '0 0 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Record new symptoms, case counts, or observations directly to the ML tuning model.</p>
+                              <p style={{ margin: '0 0 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Record new symptoms, case counts, or observations.</p>
                               
-                              <div style={{ position: 'relative', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                <textarea 
-                                  placeholder="e.g. 5 new malaria cases found today, rapid tests positive..." 
-                                  className="form-input" 
-                                  rows={2}
-                                  style={{ 
-                                    width: '100%', 
-                                    padding: '0.75rem', 
-                                    paddingBottom: '2.5rem',
-                                    fontSize: '0.875rem', 
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    resize: 'none',
-                                    background: 'transparent',
-                                    boxShadow: 'none'
-                                  }} 
-                                />
-                                <div style={{ position: 'absolute', bottom: '0.4rem', right: '0.4rem', left: '0.4rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <div style={{ display: 'flex', gap: '0.25rem' }}>
-                                    <button className="btn btn-outline" style={{ padding: '0.25rem', border: 'none', color: 'var(--text-muted)' }} title="Attach Photo">
-                                      <Camera size={18} />
-                                    </button>
-                                    <button className="btn btn-outline" style={{ padding: '0.25rem', border: 'none', color: 'var(--text-muted)' }} title="Attach File">
-                                      <FileText size={18} />
+                              <form onSubmit={(e) => submitObservation(task.village_id, e)} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <div style={{ position: 'relative', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                  {/* Hidden file input for camera/file attachment */}
+                                  <input type="file" id={`file-attach-${task.village_id}`} accept="image/*" style={{ display: 'none' }} />
+                                  <textarea 
+                                    id={`obs-${task.village_id}`}
+                                    aria-label="Log field observation"
+                                    placeholder="e.g. 5 new malaria cases found today, rapid tests positive..." 
+                                    className="form-input" 
+                                    rows={2}
+                                    value={observationText}
+                                    onChange={e => setObservationText(e.target.value)}
+                                    style={{ 
+                                      width: '100%', 
+                                      padding: '0.75rem', 
+                                      paddingBottom: '2.5rem',
+                                      fontSize: '0.875rem', 
+                                      border: 'none',
+                                      borderRadius: '8px',
+                                      resize: 'none',
+                                      background: 'transparent',
+                                      // Preserve focus ring — do NOT override boxShadow here
+                                    }} 
+                                  />
+                                  <div style={{ position: 'absolute', bottom: '0.4rem', right: '0.4rem', left: '0.4rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                      <button 
+                                        type="button"
+                                        className="btn btn-outline" 
+                                        style={{ padding: '0.25rem', border: 'none', color: 'var(--text-muted)' }} 
+                                        title="Attach Photo"
+                                        aria-label="Attach photo"
+                                        onClick={() => document.getElementById(`file-attach-${task.village_id}`)?.click()}
+                                      >
+                                        <Camera size={18} />
+                                      </button>
+                                      <button 
+                                        type="button"
+                                        className="btn btn-outline" 
+                                        style={{ padding: '0.25rem', border: 'none', color: 'var(--text-muted)' }} 
+                                        title="Attach File"
+                                        aria-label="Attach file"
+                                        onClick={() => document.getElementById(`file-attach-${task.village_id}`)?.click()}
+                                      >
+                                        <FileText size={18} />
+                                      </button>
+                                    </div>
+                                    <button 
+                                      type="submit"
+                                      disabled={observationSubmitting || !observationText.trim()}
+                                      className="btn btn-primary" 
+                                      style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                                      aria-label="Submit field observation"
+                                    >
+                                      <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{observationSubmitting ? '...' : 'Log'}</span>
+                                      <Send size={14} />
                                     </button>
                                   </div>
-                                  <button className="btn btn-primary" style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.25rem' }} title="Submit Feedback for ML tuning">
-                                    <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Log</span>
-                                    <Send size={14} />
-                                  </button>
                                 </div>
-                              </div>
+                              </form>
                             </div>
 
                             <button 
@@ -408,26 +460,29 @@ export default function FieldWorkerDashboard() {
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.5rem' }}>Severity Level</label>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div role="radiogroup" aria-label="Incident severity" style={{ display: 'flex', gap: '0.5rem' }}>
                       {[
-                        { label: 'Critical', val: 'critical', color: 'var(--rose)' },
-                        { label: 'High', val: 'high', color: 'var(--amber)' },
-                        { label: 'Medium', val: 'medium', color: 'var(--indigo)' },
-                        { label: 'Low', val: 'low', color: 'var(--emerald)' }
+                        { label: 'Critical', val: 'critical', color: 'var(--rose)', darkText: false },
+                        { label: 'High', val: 'high', color: '#b45309', darkText: false },     // dark amber for contrast
+                        { label: 'Medium', val: 'medium', color: 'var(--indigo)', darkText: false },
+                        { label: 'Low', val: 'low', color: '#065f46', darkText: false }           // dark emerald for contrast
                       ].map((sev) => (
-                        <div 
+                        <button 
                           key={sev.val}
+                          type="button"
+                          role="radio"
+                          aria-checked={incidentForm.severity === sev.val}
                           onClick={() => setIncidentForm({...incidentForm, severity: sev.val})}
                           style={{
                             flex: 1, textAlign: 'center', padding: '0.6rem 0.25rem', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
                             background: incidentForm.severity === sev.val ? sev.color : 'var(--bg-secondary)',
                             color: incidentForm.severity === sev.val ? '#fff' : 'var(--text-secondary)',
+                            border: incidentForm.severity === sev.val ? `2px solid ${sev.color}` : '2px solid transparent',
                             transition: 'all 0.2s',
-                            boxShadow: incidentForm.severity === sev.val ? `0 4px 12px ${sev.color}40` : 'none'
                           }}
                         >
                           {sev.label}
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -476,21 +531,26 @@ export default function FieldWorkerDashboard() {
                       </div>
                       <div style={{ flex: 2 }}>
                         <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.5rem' }}>Urgency</label>
-                        <div style={{ display: 'flex', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '8px' }}>
+                        <div role="radiogroup" aria-label="Medicine urgency" style={{ display: 'flex', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '8px' }}>
                           {['low', 'medium', 'high'].map((urg) => (
-                            <div 
+                            <button 
                               key={urg}
+                              type="button"
+                              role="radio"
+                              aria-checked={medicineForm.urgency === urg}
                               onClick={() => setMedicineForm({...medicineForm, urgency: urg})}
                               style={{
                                 flex: 1, textAlign: 'center', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, textTransform: 'capitalize',
                                 background: medicineForm.urgency === urg ? 'var(--bg-card)' : 'transparent',
-                                color: medicineForm.urgency === urg ? 'var(--emerald)' : 'var(--text-secondary)',
+                                // Use dark text (#065f46) on selected emerald to meet WCAG-AA contrast
+                                color: medicineForm.urgency === urg ? '#065f46' : 'var(--text-secondary)',
+                                border: medicineForm.urgency === urg ? '1px solid var(--border)' : '1px solid transparent',
                                 boxShadow: medicineForm.urgency === urg ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
                                 transition: 'all 0.2s'
                               }}
                             >
                               {urg}
-                            </div>
+                            </button>
                           ))}
                         </div>
                       </div>

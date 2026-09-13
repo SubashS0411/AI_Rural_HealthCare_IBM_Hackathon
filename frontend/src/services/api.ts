@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Read API base URL from Vite environment. Set VITE_API_URL in .env for deployments.
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api/v1';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: API_BASE_URL,
 });
 
 // Attach JWT to every request

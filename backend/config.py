@@ -2,6 +2,11 @@ from pydantic_settings import BaseSettings
 from typing import List
 import os
 
+# Resolve .env relative to this file (backend/.env), not the CWD.
+# This ensures the file is found whether uvicorn is launched from the project root
+# (python -m uvicorn backend.main:app) or from inside the backend/ directory.
+_ENV_FILE = os.path.join(os.path.dirname(__file__), ".env")
+
 
 class Settings(BaseSettings):
     """Application configuration settings"""
@@ -14,7 +19,7 @@ class Settings(BaseSettings):
     PORT: int = 8000
     
     # Database
-    DATABASE_URL: str = "sqlite:///./health_intelligence_v2.db"
+    DATABASE_URL: str = "sqlite:///./health_intelligence.db"
     
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
@@ -28,7 +33,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     
     class Config:
-        env_file = ".env"
+        env_file = _ENV_FILE
         case_sensitive = True
 
 

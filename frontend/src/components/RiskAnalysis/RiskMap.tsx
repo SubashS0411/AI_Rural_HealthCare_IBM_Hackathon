@@ -16,14 +16,14 @@ function MapUpdater({ villages, selectedId }: { villages: VillageRisk[], selecte
     
     if (selectedId) {
       const v = villages.find(x => x.village_id === selectedId);
-      if (v?.latitude && v?.longitude) {
+      if (v?.latitude != null && v?.longitude != null) {
         map.flyTo([v.latitude, v.longitude], 12);
         return;
       }
     }
     
-    // Auto-center based on all villages
-    const valid = villages.filter(v => v.latitude && v.longitude);
+    // Auto-center based on all villages with valid coordinates
+    const valid = villages.filter(v => v.latitude != null && v.longitude != null);
     if (valid.length > 0) {
       const latSum = valid.reduce((sum, v) => sum + v.latitude!, 0);
       const lngSum = valid.reduce((sum, v) => sum + v.longitude!, 0);
@@ -61,7 +61,7 @@ export default function RiskMap({ villages, selectedId, onSelect }: RiskMapProps
         <MapUpdater villages={villages} selectedId={selectedId} />
         
         {villages.map(v => {
-          if (!v.latitude || !v.longitude) return null;
+          if (v.latitude == null || v.longitude == null) return null;
           const isSelected = v.village_id === selectedId;
           const color = getColor(v.composite_score);
           

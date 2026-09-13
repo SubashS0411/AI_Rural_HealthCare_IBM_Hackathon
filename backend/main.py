@@ -18,7 +18,11 @@ logger = logging.getLogger(__name__)
 
 
 def _seed_preset_users() -> None:
-    """Ensure the 3 demo logins exist in the DB."""
+    """Ensure the 3 demo logins exist in the DB — only when DEBUG=True."""
+    if not settings.DEBUG:
+        logger.info("DEBUG=False: skipping demo user seeding (use real credentials in production).")
+        return
+
     PRESET_USERS = [
         {"email": "admin@healthnet.com",  "password": "Admin@123", "role": "admin"},
         {"email": "doctor@healthnet.com", "password": "Doctor@456", "role": "coordinator"},
@@ -34,7 +38,7 @@ def _seed_preset_users() -> None:
                     role=u["role"]
                 ))
         db.commit()
-        logger.info("Preset users seeded successfully.")
+        logger.info("Demo preset users seeded successfully.")
     except Exception as exc:
         db.rollback()
         logger.error(f"Error seeding users: {exc}")
@@ -45,10 +49,26 @@ def _seed_preset_users() -> None:
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     """Run startup tasks then yield."""
+    # Warn on insecure default secret key
+    if settings.SECRET_KEY == "your-secret-key-change-in-production":
+        if not settings.DEBUG:
+            raise RuntimeError(
+                "SECRET_KEY is set to the default placeholder. "
+                "Set a strong SECRET_KEY environment variable before running in production."
+            )
+        else:
+            import secrets
+            # In DEBUG mode, generate a temporary random key but warn loudly
+            logger.warning(
+                "SECRET_KEY is using default placeholder — generated ephemeral key for this session. "
+                "Any existing tokens will be invalid after restart. Set SECRET_KEY in .env for persistence."
+            )
+            settings.SECRET_KEY = secrets.token_hex(32)
+
     # Create all DB tables
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables ready.")
-    # Seed default users
+    # Seed default users (only in DEBUG mode)
     _seed_preset_users()
     yield
     # (shutdown logic here if needed)
@@ -104,5 +124,5 @@ if __name__ == "__main__":
         "backend.main:app",
         host=settings.HOST,
         port=settings.PORT,
-        reload=True,
+        reload=settings.DEBUG,  # only auto-reload in DEBUG mode
     )

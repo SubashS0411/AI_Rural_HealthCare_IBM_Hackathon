@@ -50,7 +50,7 @@ export default function RiskDashboard() {
   const [loading, setLoading] = useState(false);
   const [selectedVillageId, setSelectedVillageId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'analytics' | 'planner'>('analytics');
-  
+
   // ML Anomaly Banner State
   const [anomalies, setAnomalies] = useState<any[]>([]);
   const [showBanner, setShowBanner] = useState(true);
@@ -62,7 +62,7 @@ export default function RiskDashboard() {
         setSelectedDistrictId(res.data[0].id);
       }
     });
-    
+
     // Fetch ML anomalies
     api.get('/ml/anomalies').then(res => {
       if (res.data.anomalies) {
@@ -71,17 +71,27 @@ export default function RiskDashboard() {
     }).catch(err => console.error(err));
   }, []);
 
+  const [rankingError, setRankingError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!selectedDistrictId) {
       setRanking(null);
       return;
     }
     setLoading(true);
+    setRankingError(null);
     setSelectedVillageId(null);
     api
       .get<RankingResponse>(`/districts/${selectedDistrictId}/ranking`)
-      .then((res) => setRanking(res.data))
-      .catch((err) => console.error('Failed to load ranking', err))
+      .then((res) => {
+        setRanking(res.data);
+        setRankingError(null);
+      })
+      .catch((err) => {
+        console.error('Failed to load ranking', err);
+        setRanking(null);  // clear stale rankings from previous district
+        setRankingError('Failed to load village rankings. Please try again.');
+      })
       .finally(() => setLoading(false));
   }, [selectedDistrictId]);
 
@@ -107,6 +117,14 @@ export default function RiskDashboard() {
         </div>
       )}
 
+      {/* Ranking Error State */}
+      {rankingError && (
+        <div className="alert alert-error" style={{ marginBottom: '1rem' }}>
+          <AlertCircle size={16} style={{ display: 'inline', marginRight: '0.5rem' }} />
+          {rankingError}
+        </div>
+      )}
+
       <div className="flex-between">
         <div>
           <label htmlFor="district-select" style={{ marginRight: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
@@ -120,21 +138,21 @@ export default function RiskDashboard() {
             onChange={(e) => setSelectedDistrictId(Number(e.target.value))}
           >
             {districts.map((d) => (
-               <option key={d.id} value={d.id}>{d.name}</option>
+              <option key={d.id} value={d.id}>{d.name}</option>
             ))}
           </select>
         </div>
-        
+
         {/* Tab Toggle for Right Panel */}
         <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.25rem', borderRadius: '8px' }}>
-          <button 
+          <button
             className={`btn ${activeTab === 'analytics' ? 'btn-primary' : ''}`}
             style={{ padding: '0.5rem 1rem', background: activeTab === 'analytics' ? 'var(--indigo)' : 'transparent' }}
             onClick={() => setActiveTab('analytics')}
           >
             Analytics
           </button>
-          <button 
+          <button
             className={`btn ${activeTab === 'planner' ? 'btn-primary' : ''}`}
             style={{ padding: '0.5rem 1rem', background: activeTab === 'planner' ? 'var(--indigo)' : 'transparent' }}
             onClick={() => setActiveTab('planner')}
@@ -145,17 +163,17 @@ export default function RiskDashboard() {
       </div>
 
       {loading && <div className="spinner" style={{ marginTop: '2rem' }} />}
-      
+
       {!loading && ranking && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
           <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
             {/* Left Column: Map & Table */}
             <div style={{ flex: '1 1 50%', minWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div className="glass" style={{ padding: '1rem', height: '400px' }}>
-                 <RiskMap villages={ranking.villages} selectedId={selectedVillageId} onSelect={setSelectedVillageId} />
+                <RiskMap villages={ranking.villages} selectedId={selectedVillageId} onSelect={setSelectedVillageId} />
               </div>
               <div className="glass" style={{ padding: '1rem' }}>
-                 <RiskTable villages={ranking.villages} selectedId={selectedVillageId} onSelect={setSelectedVillageId} />
+                <RiskTable villages={ranking.villages} selectedId={selectedVillageId} onSelect={setSelectedVillageId} />
               </div>
             </div>
 
@@ -164,13 +182,13 @@ export default function RiskDashboard() {
               {activeVillage ? (
                 <VillageDetail village={activeVillage} districtId={selectedDistrictId!} onClose={() => setSelectedVillageId(null)} />
               ) : (
-                activeTab === 'analytics' 
+                activeTab === 'analytics'
                   ? <DistrictAnalytics ranking={ranking} />
                   : <AllocationPlanner districtId={selectedDistrictId!} />
               )}
             </div>
           </div>
-          
+
           <div>
             <FieldRequestsFeed />
           </div>
