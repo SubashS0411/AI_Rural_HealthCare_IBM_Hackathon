@@ -162,3 +162,19 @@ class IncidentReport(Base):
     status = Column(String(50), default="open") # open/acknowledged/resolved
 
     village = relationship("Village", backref="incident_reports")
+class Intervention(Base):
+    """Planned or completed intervention for a village"""
+    __tablename__ = "interventions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    village_id = Column(Integer, ForeignKey("villages.id"), nullable=False, index=True)
+    resource_type = Column(String(50), nullable=False) # specialist/mmu/medicine/testing_kits/awareness/vector_control
+    description = Column(Text, nullable=False)
+    status = Column(String(20), default="planned", nullable=False) # planned/in_progress/completed
+    assigned_by = Column(String(100), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+    risk_score_before = Column(Float, nullable=True)
+    risk_score_after = Column(Float, nullable=True)
+
+    village = relationship("Village", backref="interventions")

@@ -5,6 +5,7 @@ import RiskMap from '../RiskAnalysis/RiskMap';
 import RiskTable from '../RiskAnalysis/RiskTable';
 import VillageDetail from '../RiskAnalysis/VillageDetail';
 import FieldRequestsFeed from '../RiskAnalysis/FieldRequestsFeed';
+import InterventionPanel from '../Interventions/InterventionPanel';
 import type { RankingResponse, District } from '../RiskAnalysis/RiskDashboard';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { Home, ShieldAlert, Users, Activity } from 'lucide-react';
@@ -105,7 +106,21 @@ export default function OfficerDashboard() {
         </div>
       </div>
 
-      {loading && <div className="spinner" style={{ margin: '4rem auto' }} />}
+      {loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+            <div className="skeleton-card" style={{ height: '100px', borderRadius: '12px' }}></div>
+            <div className="skeleton-card" style={{ height: '100px', borderRadius: '12px' }}></div>
+            <div className="skeleton-card" style={{ height: '100px', borderRadius: '12px' }}></div>
+            <div className="skeleton-card" style={{ height: '100px', borderRadius: '12px' }}></div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '1.5rem' }}>
+            <div className="skeleton-card" style={{ height: '400px', borderRadius: '12px' }}></div>
+            <div className="skeleton-card" style={{ height: '400px', borderRadius: '12px' }}></div>
+            <div className="skeleton-card" style={{ height: '400px', borderRadius: '12px' }}></div>
+          </div>
+        </div>
+      )}
       
       {!loading && ranking && ranking.villages.length === 0 && (
         <div className="glass" style={{ padding: '3rem', textAlign: 'center', borderRadius: '12px', marginTop: '2rem' }}>
@@ -150,7 +165,9 @@ export default function OfficerDashboard() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>ACTIVE WORKERS</div>
-                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1 }}>18</div>
+                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1 }} title="Sample data">
+                  18 <span style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 'normal' }}>(sample)</span>
+                </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>deployed in field</div>
               </div>
             </div>
@@ -286,6 +303,9 @@ export default function OfficerDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Interventions Section */}
+          <InterventionPanel districtId={districtId} />
 
           {/* Lower section: Map and Table */}
           <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>

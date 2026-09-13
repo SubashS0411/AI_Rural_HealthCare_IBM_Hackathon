@@ -162,7 +162,19 @@ export default function RiskDashboard() {
         </div>
       </div>
 
-      {loading && <div className="spinner" style={{ marginTop: '2rem' }} />}
+      {loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 50%', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div className="skeleton-card" style={{ height: '400px', borderRadius: '12px' }}></div>
+              <div className="skeleton-card" style={{ height: '300px', borderRadius: '12px' }}></div>
+            </div>
+            <div style={{ flex: '1 1 40%' }}>
+              <div className="skeleton-card" style={{ height: '600px', borderRadius: '12px' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {!loading && ranking && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>

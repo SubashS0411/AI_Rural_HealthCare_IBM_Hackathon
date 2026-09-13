@@ -89,7 +89,9 @@ export default function CoordinatorDashboard() {
             </div>
             <div>
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Inventory Health</p>
-              <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.75rem', color: 'var(--text-primary)' }}>68%</h3>
+              <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.75rem', color: 'var(--text-primary)' }}>
+                68% <span style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 'normal' }}>(sample)</span>
+              </h3>
             </div>
           </motion.div>
 
@@ -99,7 +101,9 @@ export default function CoordinatorDashboard() {
             </div>
             <div>
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Critical Priority Clusters</p>
-              <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.75rem', color: 'var(--text-primary)' }}>2</h3>
+              <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.75rem', color: 'var(--text-primary)' }}>
+                2 <span style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 'normal' }}>(sample)</span>
+              </h3>
             </div>
           </motion.div>
         </div>
@@ -178,9 +182,12 @@ export default function CoordinatorDashboard() {
 
           {/* Inventory Graph */}
           <motion.div variants={itemVariants} className="glass" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: 'var(--text-primary)' }}>
-              <PackageSearch size={20} color="var(--emerald)" /> Regional Inventory Levels
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--text-primary)' }}>
+                <PackageSearch size={20} color="var(--emerald)" /> Regional Inventory Levels
+              </h3>
+              <span className="badge badge-default">Sample Data</span>
+            </div>
             
             <div style={{ flex: 1, minHeight: '300px' }}>
               <ResponsiveContainer width="100%" height="100%">

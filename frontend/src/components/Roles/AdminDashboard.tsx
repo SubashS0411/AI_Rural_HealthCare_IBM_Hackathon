@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Layout from '../Layout';
 import RiskDashboard from '../RiskAnalysis/RiskDashboard';
+import InterventionPanel from '../Interventions/InterventionPanel';
 import api from '../../services/api';
 import { Activity, BrainCircuit, LineChart, Network, ShieldCheck } from 'lucide-react';
 
@@ -97,6 +98,11 @@ export default function AdminDashboard() {
         {/* Core Admin Risk Dashboard */}
         <div style={{ flex: 1 }}>
           <RiskDashboard />
+        </div>
+
+        {/* Global Interventions */}
+        <div style={{ flex: 1, marginTop: '2rem' }}>
+          <InterventionPanel districtId={1} />
         </div>
 
       </div>

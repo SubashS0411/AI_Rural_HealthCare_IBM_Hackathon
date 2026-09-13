@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from backend.routers import health_data, auth, risk, ml, field
+from backend.routers import health_data, auth, risk, ml, field, interventions
 from backend.config import settings
 from backend.database import engine, SessionLocal, init_db
 from backend.models import Base, User
@@ -103,6 +103,7 @@ app.include_router(health_data.router, prefix="/api/v1", tags=["health-data"])
 app.include_router(risk.router,        prefix="/api/v1", tags=["risk"])
 app.include_router(ml.router,          prefix="/api/v1/ml", tags=["ml"])
 app.include_router(field.router,       prefix="/api/v1", tags=["field"])
+app.include_router(interventions.router, prefix="/api/v1", tags=["interventions"])
 
 @app.get("/")
 async def root():

@@ -235,9 +235,20 @@ async def create_health_record(record: HealthRecordCreate, db: Session = Depends
 
 
 @router.get("/health-records", response_model=List[HealthRecordResponse])
-async def list_health_records(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def list_health_records(
+    skip: int = 0, 
+    limit: int = 100, 
+    village_id: int | None = None,
+    disease_type: str | None = None,
+    db: Session = Depends(get_db)
+):
     """List all health records"""
-    records = db.query(HealthRecord).offset(skip).limit(limit).all()
+    query = db.query(HealthRecord)
+    if village_id:
+        query = query.filter(HealthRecord.village_id == village_id)
+    if disease_type:
+        query = query.filter(HealthRecord.disease_type == disease_type)
+    records = query.offset(skip).limit(limit).all()
     return records
 
 

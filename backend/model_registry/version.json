@@ -1,8 +1,8 @@
 {
-  "model_a": true,
+  "model_a": false,
   "model_b": false,
   "model_c": true,
-  "model_d": true,
-  "trained_at": "2026-09-12T16:10:14.896721+00:00",
-  "record_count": 28
+  "model_d": false,
+  "trained_at": "2026-09-13T04:32:48.649714+00:00",
+  "record_count": 0
 }

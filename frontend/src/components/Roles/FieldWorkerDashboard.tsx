@@ -21,6 +21,7 @@ export default function FieldWorkerDashboard() {
   // Observation log state
   const [observationText, setObservationText] = useState('');
   const [observationSubmitting, setObservationSubmitting] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState<number>(0);
   
   const [incidentForm, setIncidentForm] = useState({ type: 'disease_outbreak', severity: 'high', description: '' });
   const [medicineForm, setMedicineForm] = useState({ name: '', quantity: 10, urgency: 'high', notes: '' });
@@ -29,15 +30,18 @@ export default function FieldWorkerDashboard() {
 
   useEffect(() => {
     setLoading(true);
-    api
-      .get<RankingResponse>(`/districts/${districtId}/ranking`)
-      .then((res) => {
-        if (res.data.villages) {
+    Promise.all([
+      api.get<RankingResponse>(`/districts/${districtId}/ranking`),
+      api.get(`/incident-reports?status=resolved`).catch(() => ({ data: [] }))
+    ])
+      .then(([rankingRes, incidentsRes]) => {
+        if (rankingRes.data.villages) {
           // Take top 3 highest risk villages as assigned tasks
-          setTasks(res.data.villages.slice(0, 3));
+          setTasks(rankingRes.data.villages.slice(0, 3));
         }
+        setCompletedTasks(incidentsRes.data.length || 0);
       })
-      .catch((err) => console.error('Failed to load ranking', err))
+      .catch((err) => console.error('Failed to load dashboard data', err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -140,10 +144,14 @@ export default function FieldWorkerDashboard() {
     }
   };
 
-  const progressData = [
-    { name: 'Completed', value: 12, fill: '#10b981' }, // emerald
-    { name: 'Pending', value: tasks.length, fill: '#6366f1' } // indigo
-  ];
+  const progressData = completedTasks > 0 
+    ? [
+        { name: 'Completed', value: completedTasks, fill: '#10b981' }, // emerald
+        { name: 'Pending', value: tasks.length, fill: '#6366f1' } // indigo
+      ]
+    : [
+        { name: 'Pending', value: tasks.length, fill: '#6366f1' } // indigo
+      ];
 
   return (
     <Layout title="Field Tasks">
@@ -183,7 +191,9 @@ export default function FieldWorkerDashboard() {
           <div className="glass" style={{ padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem', color: 'var(--text-primary)' }}>Weekly Progress</h3>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>You've completed 12 tasks this week!</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                {completedTasks > 0 ? `You've completed ${completedTasks} tasks this week!` : `You have ${tasks.length} pending assignments.`}
+              </div>
             </div>
             <div style={{ height: '80px', width: '80px' }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -287,11 +297,15 @@ export default function FieldWorkerDashboard() {
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '8px' }}>
                                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>LAST VISITED</div>
-                                <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500 }}>Oct 12 (3 days ago)</div>
+                                <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500 }}>
+                                  Oct 12 (3 days ago) <span style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 'normal' }}>(sample)</span>
+                                </div>
                               </div>
                               <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '8px' }}>
                                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>PATIENTS SCREENED</div>
-                                <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500 }}>45 / 50 Target</div>
+                                <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500 }}>
+                                  45 / 50 Target <span style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 'normal' }}>(sample)</span>
+                                </div>
                               </div>
                             </div>
 

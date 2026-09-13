@@ -115,9 +115,12 @@ export default function PatternList() {
         
         {/* 1. Radar Chart */}
         <div className="glass" style={{ padding: '1.5rem', borderRadius: '12px', minHeight: '300px', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '1rem', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Network size={18} color="var(--cyan)" /> AI Confidence Profile
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Network size={18} color="var(--cyan)" /> AI Confidence Profile
+            </h3>
+            <span className="badge badge-default" style={{ fontSize: '0.65rem' }}>Sample Data</span>
+          </div>
           <div style={{ flex: 1, minHeight: '220px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
@@ -133,9 +136,12 @@ export default function PatternList() {
 
         {/* 2. Donut Chart */}
         <div className="glass" style={{ padding: '1.5rem', borderRadius: '12px', minHeight: '300px', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '1rem', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Activity size={18} color="var(--emerald)" /> Pattern Distribution
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Activity size={18} color="var(--emerald)" /> Pattern Distribution
+            </h3>
+            <span className="badge badge-default" style={{ fontSize: '0.65rem' }}>Sample Data</span>
+          </div>
           <div style={{ flex: 1, minHeight: '220px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -153,9 +159,12 @@ export default function PatternList() {
 
         {/* 3. Scatter Chart */}
         <div className="glass" style={{ padding: '1.5rem', borderRadius: '12px', minHeight: '300px', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '1rem', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <ShieldCheck size={18} color="var(--amber)" /> Data Depth vs Accuracy
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ShieldCheck size={18} color="var(--amber)" /> Data Depth vs Accuracy
+            </h3>
+            <span className="badge badge-default" style={{ fontSize: '0.65rem' }}>Sample Data</span>
+          </div>
           <div style={{ flex: 1, minHeight: '220px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
@@ -176,9 +185,12 @@ export default function PatternList() {
         
         {/* 4. Area Chart */}
         <div className="glass" style={{ padding: '1.5rem', borderRadius: '12px', minHeight: '300px', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '1rem', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <LineChartIcon size={18} color="var(--rose)" /> 14-Day Outbreak Forecast (Dengue)
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <LineChartIcon size={18} color="var(--rose)" /> 14-Day Outbreak Forecast (Dengue)
+            </h3>
+            <span className="badge badge-default" style={{ fontSize: '0.65rem' }}>Sample Data</span>
+          </div>
           <div style={{ flex: 1, minHeight: '240px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={forecastData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -201,9 +213,12 @@ export default function PatternList() {
 
         {/* 5. Composed/Bar Chart */}
         <div className="glass" style={{ padding: '1.5rem', borderRadius: '12px', minHeight: '300px', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '1rem', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Network size={18} color="var(--indigo)" /> Village Risk Clusters
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Network size={18} color="var(--indigo)" /> Village Risk Clusters
+            </h3>
+            <span className="badge badge-default" style={{ fontSize: '0.65rem' }}>Sample Data</span>
+          </div>
           <div style={{ flex: 1, minHeight: '240px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={clusterData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
